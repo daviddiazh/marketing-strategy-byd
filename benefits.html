@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BYD - Tu vida, potenciada</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #fafafa;
+      color: #1a1a1a;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(250,250,250,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    nav .logo {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.15em;
+      color: #1a1a1a;
+      text-decoration: none;
+    }
+
+    nav a.back-link {
+      font-size: 14px;
+      color: rgba(0,0,0,0.5);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.3s;
+    }
+
+    nav a.back-link:hover {
+      color: #1a1a1a;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 160px 24px 100px;
+      background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+    }
+
+    .hero .overline {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 800px;
+      color: #0d0d0d;
+    }
+
+    .hero h1 strong {
+      font-weight: 600;
+    }
+
+    .hero .hero-sub {
+      margin-top: 24px;
+      font-size: 1.15rem;
+      color: rgba(0,0,0,0.5);
+      font-weight: 300;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .hero .scroll-indicator {
+      margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero .scroll-indicator span {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.25);
+    }
+
+    .hero .scroll-indicator .line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(8px); }
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .section.reverse .section-text { order: 2; }
+    .section.reverse .section-image { order: 1; }
+
+    .section-text .section-number {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.3);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .section-text h2 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: #0d0d0d;
+    }
+
+    .section-text .concept {
+      font-size: 1.0rem;
+      color: rgba(0,0,0,0.55);
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .section-text .facility {
+      font-size: 0.95rem;
+      color: rgba(0,0,0,0.6);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .section-text h3 {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.4);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+
+    .section-text ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .section-text ul li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      color: rgba(0,0,0,0.65);
+      line-height: 1.6;
+    }
+
+    .section-text ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3483fa;
+    }
+
+    .section-text .supply-note {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: rgba(0,0,0,0.03);
+      border-left: 2px solid rgba(52,131,250,0.4);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.6;
+    }
+
+    .section-text .supply-note strong {
+      color: rgba(0,0,0,0.7);
+      font-weight: 600;
+    }
+
+    /* ── IMAGE ── */
+    .section-image {
+      width: 100%;
+      /* aspect-ratio: 4 / 3; */
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+
+    .section-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: rgba(0,0,0,0.1);
+      margin: 0 auto;
+    }
+
+    /* ── HARDWARE SECTION ── */
+    .hardware {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 48px;
+    }
+
+    .hardware .hw-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .hardware .hw-header .section-number {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.3);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .hardware .hw-header h2 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: #0d0d0d;
+    }
+
+    .hw-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    .hw-card {
+      padding: 36px 28px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 16px;
+      transition: box-shadow 0.3s;
+    }
+
+    .hw-card:hover {
+      box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+    }
+
+    .hw-card .hw-icon {
+      width: 48px;
+      height: 48px;
+      background: #f0f0f0;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .hw-card h4 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #0d0d0d;
+    }
+
+    .hw-card p {
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.65;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      width: 100%;
+      padding: 140px 24px;
+      text-align: center;
+      background: #0a0a14;
+      color: white;
+    }
+
+    .cta-section p {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 300;
+      max-width: 700px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .cta-section .cta-btn {
+      display: inline-block;
+      padding: 18px 44px;
+      background: white;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    .cta-section .cta-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(100,160,255,0.25);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0a0a14;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 32px 48px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.04em;
+    }
+
+    footer span {
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .section {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        padding: 80px 28px;
+      }
+
+      .section.reverse .section-text { order: 1; }
+      .section.reverse .section-image { order: 2; }
+
+      .hw-grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav { padding: 20px 24px; }
+
+      .hardware { padding: 80px 28px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">BYD</a>
+    <a href="index.html" class="back-link">&larr; Volver al inicio</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="overline">Tu vida, potenciada por nuestro hardware</div>
+    <h1>No es solo un carro, es tu nueva <strong>infraestructura de alivio urbano.</strong></h1>
+    <p class="hero-sub">Descubre cómo cada tecnología BYD fue diseñada para simplificar tu día y darte más de lo que necesitas.</p>
+    <div class="scroll-indicator">
+      <span>Descubre</span>
+      <div class="line"></div>
+    </div>
+  </section>
+
+  <!-- SECTION 1: V2L -->
+  <div class="divider"></div>
+  <section class="section fade-up">
+    <div class="section-text">
+      <div class="section-number">01 — Tecnología V2L</div>
+      <h2>Energía que se comparte</h2>
+      <p class="concept">Tu BYD es una batería gigante sobre ruedas que alimenta tu mundo.</p>
+      <p class="facility">Gracias al sistema Vehicle-to-Load (V2L), el carro deja de ser un consumidor de energía para ser un proveedor.</p>
+      <h3>¿Cómo te ayuda?</h3>
+      <ul>
+        <li>Conecta una cafetera en medio de un trancón.</li>
+        <li>Carga tu laptop o equipos de fotografía mientras trabajas fuera.</li>
+        <li>Rescata a un amigo que se quedó sin carga en su bici eléctrica.</li>
+      </ul>
+    </div>
+    <div class="section-image">
+      <img src="assets/img1.jpg" alt="BYD - Energía que se comparte (V2L)">
+    </div>
+  </section>
+
+  <!-- SECTION 2: PM2.5 -->
+  <div class="divider"></div>
+  <section class="section reverse fade-up">
+    <div class="section-text">
+      <div class="section-number">02 — Sistema PM2.5</div>
+      <h2>Tu santuario de aire puro</h2>
+      <p class="concept">El aire más limpio de la ciudad no está en un parque, está dentro de tu BYD.</p>
+      <p class="facility">Filtros de alta eficiencia que eliminan el 99% de las partículas contaminantes, polen y olores del smog.</p>
+      <h3>¿Cómo te ayuda?</h3>
+      <ul>
+        <li>Entra al habitáculo y experimenta el "Reset Sensorial".</li>
+        <li>Respira aire puro mientras el resto de la ciudad lidia con la contaminación.</li>
+      </ul>
+    </div>
+    <div class="section-image">
+      <img src="assets/img2.jpg" alt="BYD - Tu santuario de aire puro (PM2.5)">
+    </div>
+  </section>
+
+  <!-- SECTION 3: Cámaras 360° -->
+  <div class="divider"></div>
+  <section class="section fade-up">
+    <div class="section-text">
+      <div class="section-number">03 — Cámaras 360° + Pantalla Giratoria</div>
+      <h2>Ojos en la espalda</h2>
+      <p class="concept">Seguridad visual total para que nunca pierdas el control.</p>
+      <p class="facility">Un sistema de cámaras de alta definición que reconstruye tu entorno en una pantalla de 12.8" que rota según tu necesidad.</p>
+      <h3>¿Cómo te ayuda?</h3>
+      <ul>
+        <li>Parquea en espacios imposibles con vista de pájaro.</li>
+        <li>Vigila tu entorno desde adentro si te sientes vulnerable en una zona oscura.</li>
+      </ul>
+    </div>
+    <div class="section-image">
+      <img src="assets/img3.jpg" alt="BYD - Cámaras 360° y Pantalla Giratoria">
+    </div>
+  </section>
+
+  <!-- SECTION 4: Hardware Inteligente -->
+  <div class="divider"></div>
+  <section class="hardware fade-up">
+    <div class="hw-header">
+      <div class="section-number">04 — Hardware Inteligente</div>
+      <h2>Complicidad en cada detalle</h2>
+    </div>
+    <div class="hw-grid">
+      <div class="hw-card">
+        <div class="hw-icon">🚗</div>
+        <h4>Baúl Eléctrico</h4>
+        <p>Apertura manos libres para cuando vienes cargado de bolsas o maletas.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-icon">💡</div>
+        <h4>Iluminación LED Proyectiva</h4>
+        <p>No solo alumbra, guía. Faros de alta potencia que limpian la oscuridad de tu camino.</p>
+      </div>
+      <div class="hw-card">
+        <div class="hw-icon">🔋</div>
+        <h4>Batería Blade</h4>
+        <p>La más segura y estable del mundo. No solo te da autonomía, te da la tranquilidad de que tu fuente de energía es indestructible.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <p>Ya viste lo que nuestro hardware puede hacer por la ciudad. Imagina lo que puede hacer por ti todos los días.</p>
+    <a href="#" class="cta-btn">AGENDA TU CITA DE MANEJO AQUÍ</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Concepto: <span>Valeria Mendez Quirama</span> · Categoría: Estrategia de Marketing</p>
+  </footer>
+
+  <!-- SCROLL REVEAL -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

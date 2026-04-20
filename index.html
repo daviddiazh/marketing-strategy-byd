@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BYD - Simplifica tu día</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html { overflow-x: hidden; }
+
+    body {
+      overflow: hidden;
+      background: #080810;
+      color: white;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* BADGE */
+    .byd-badge {
+      position: fixed;
+      top: 24px;
+      left: 28px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      z-index: 30;
+      opacity: 0.7;
+    }
+
+    /* SECCIÓN CAOS */
+    .title-chaos {
+        z-index: 25;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        font-size: 2.9rem;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        opacity: 0.95;
+        padding: 20px 40px;
+        background: rgba(8,8,16,0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        white-space: nowrap;
+    }
+
+    .chaos {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .decision {
+      position: absolute;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      font-size: 30px;
+      backdrop-filter: blur(8px);
+      color: rgba(255,255,255,0.8);
+
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .dot {
+        background-color: #3483fa;
+        /* background-color: #00A650; */
+        width: 11px;
+        height: 11px;
+        border-radius: 11px;
+    }
+
+    .chaos h1 {
+      /* styled via .title-chaos */
+    }
+
+    .cta {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 16px 32px;
+      background: white;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      z-index: 10;
+      transition: transform 0.2s;
+    }
+    .cta:hover { transform: translateX(-50%) scale(1.05); }
+
+    /* CANVAS 3D */
+    #car-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      cursor: grab;
+      z-index: 1;
+      opacity: 0;
+    }
+
+    /* VIGNETTE OVERLAY */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(0,20,60,0.4) 0%, transparent 70%),
+        linear-gradient(to top, rgba(8,8,16,0.6) 0%, transparent 35%),
+        linear-gradient(to bottom, rgba(8,8,16,0.4) 0%, transparent 20%);
+    }
+
+    /* OVERLAY DE TEXTO */
+    .calm {
+      position: relative;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0;
+      display: none;
+    }
+
+    .calm-sec1 {
+      width: 100%;
+      height: 400vh;
+      position: relative;
+    }
+
+    .calm-sec1-content {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .calm-text {
+      text-align: center;
+      width: 100%;
+      padding: 60px 24px 40px;
+      background: linear-gradient(to bottom, rgba(8,8,16,0.95) 0%, rgba(8,8,16,0.7) 60%, transparent 100%);
+    }
+
+    .calm-text h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .calm-text .line-accent {
+      display: block;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(100,160,255,0.8), transparent);
+      margin: 16px auto;
+    }
+
+    .calm-text p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.4);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+
+    /* FEATURES (aparecen al scrollear) */
+    .features {
+      position: fixed;
+      bottom: 40px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      z-index: 6;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .feature {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .feature .value {
+      font-size: 1.8rem;
+      font-weight: 200;
+      color: white;
+      line-height: 1;
+    }
+
+    .feature .label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* SCROLL INDICATOR */
+    .scroll-hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .scroll-hint .arrow {
+      width: 1px;
+      height: 24px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      animation: scrollBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50% { transform: translateY(6px); opacity: 1; }
+    }
+
+    .calm-sec2 {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      pointer-events: auto;
+      background: linear-gradient(to bottom, transparent 0%, rgba(8,8,16,0.95) 30%);
+    }
+
+    .calm-sec2 h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 200;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .calm-sec2 p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.55);
+      font-weight: 300;
+      margin-bottom: 28px;
+    }
+
+    .calm-sec2 .cta-final {
+      padding: 18px 40px;
+      background: white;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .calm-sec2 .cta-final:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(100,160,255,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="byd-badge">BYD</div>
+
+  <!-- CAOS -->
+  <div class="chaos">
+    <h1 class="title-chaos">Tu día ya es complejo</h1>
+
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Gasolina o comida?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Pico y placa?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Tráfico?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Parqueadero?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Pago gasolina o salgo este fin de semana?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Tanquear hoy… o esperar a que baje?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Cuánto me va a costar moverme esta semana?
+    </div>
+
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Gasolina o comida?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Pico y placa?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Tráfico?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Parqueadero?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Pago gasolina o salgo este fin de semana?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Tanquear hoy… o esperar a que baje?
+    </div>
+    <div class="decision">
+        <div class="dot"></div>
+        ¿Cuánto me va a costar moverme esta semana?
+    </div>
+
+    <div class="cta">Simplificar mi día con BYD</div>
+  </div>
+
+  <!-- CANVAS 3D -->
+  <canvas id="car-canvas"></canvas>
+  <div class="vignette"></div>
+
+  <!-- SCROLL INDICATOR -->
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="feature">
+      <div class="value">0 km</div>
+      <div class="label">Costo por km</div>
+    </div>
+    <div class="feature">
+      <div class="value">400 km</div>
+      <div class="label">Autonomía</div>
+    </div>
+    <div class="feature">
+      <div class="value">0</div>
+      <div class="label">Emisiones</div>
+    </div>
+    <div class="feature">
+      <div class="value">30 min</div>
+      <div class="label">Carga rápida</div>
+    </div>
+  </div>
+
+  <!-- OVERLAY CALMA -->
+  <div class="calm">
+    <div class="calm-sec1">
+      <div class="calm-sec1-content">
+        <div class="calm-text">
+          <h2>BYD lo hace fácil</h2>
+          <div class="line-accent"></div>
+          <p>Menos decisiones. Más vida.</p>
+        </div>
+      </div>
+    </div>
+    <div class="calm-sec2">
+      <h2>Muévete sin pensarlo tanto</h2>
+      <p>Descubre porqué es tan fácil moverte con BYD</p>
+      <button class="cta-final">Quiero conocer más</button>
+
+      <div style="position: absolute; bottom: 15px; width: 100%; text-align: center;">
+        <p>Concepto: <span style="font-weight: 400; font-size: 18px; color: #e0e0e0;"> Valeria Mendez Quirama</span></p>
+        <p style="margin-top: -10px;">Categoría | Estrategia de Marketing</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/ScrollTrigger.min.js"></script>
+
+  <!-- THREE.JS -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+    const callToAction = document.querySelector('.cta-final');
+
+    function usage() {
+        window.location.replace('/benefits.html')
+    }
+
+    callToAction.addEventListener('click', usage)
+
+    const { gsap, ScrollTrigger } = window;
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ─── SCENE SETUP ───
+    const canvas = document.getElementById('car-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060610);
+    scene.fog = new THREE.FogExp2(0x060610, 0.035);
+
+    const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 100);
+    camera.position.set(7, 3.5, 9);
+    camera.lookAt(0, 0.6, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // ─── ENVIRONMENT ───
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment()).texture;
+
+    // ─── MATERIALS ───
+    const bodyMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0d1b3e,
+      metalness: 0.95,
+      roughness: 0.12,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+    });
+
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0x88ccff,
+      metalness: 0.1,
+      roughness: 0,
+      transmission: 0.85,
+      transparent: true,
+      opacity: 0.4,
+      ior: 1.5,
+    });
+
+    const tireMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
+    const rimMat = new THREE.MeshStandardMaterial({ color: 0xbbbbbb, metalness: 1.0, roughness: 0.08 });
+
+    const headlightMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 3,
+    });
+    const taillightMat = new THREE.MeshStandardMaterial({
+      color: 0xff1a1a, emissive: 0xff1a1a, emissiveIntensity: 2,
+    });
+
+    // ─── HELPERS ───
+    function createRoundedBoxGeo(w, h, depth, r) {
+      const shape = new THREE.Shape();
+      const hw = w / 2 - r, hh = h / 2 - r;
+      shape.moveTo(-hw, -h / 2);
+      shape.lineTo(hw, -h / 2);
+      shape.quadraticCurveTo(w / 2, -h / 2, w / 2, -hh);
+      shape.lineTo(w / 2, hh);
+      shape.quadraticCurveTo(w / 2, h / 2, hw, h / 2);
+      shape.lineTo(-hw, h / 2);
+      shape.quadraticCurveTo(-w / 2, h / 2, -w / 2, hh);
+      shape.lineTo(-w / 2, -hh);
+      shape.quadraticCurveTo(-w / 2, -h / 2, -hw, -h / 2);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth, bevelEnabled: true, bevelSize: r, bevelThickness: r, bevelSegments: 4,
+      });
+      geo.center();
+      return geo;
+    }
+
+    // ─── CAR (GLTF or fallback) ───
+    let car = new THREE.Group();
+    car.rotation.y = Math.PI * 0.15;
+    scene.add(car);
+
+    // Try to load real BYD model, fallback to procedural
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
+
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+
+    // 🔧 Place your BYD .glb file in the project folder and update this path
+    // https://sketchfab.com/
+    gltfLoader.load('./byd.glb', (gltf) => {
+      const model = gltf.scene;
+
+      // Auto-scale to fit ~4.5 units wide
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3());
+      const scale = 4.5 / Math.max(size.x, size.z);
+      model.scale.setScalar(scale);
+
+      // Center and ground it
+      const scaledBox = new THREE.Box3().setFromObject(model);
+      const center = scaledBox.getCenter(new THREE.Vector3());
+      model.position.set(-center.x, -scaledBox.min.y, -center.z);
+
+      // Enable shadows
+      model.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      car.add(model);
+      console.log('✅ BYD model loaded');
+    }, undefined, () => {
+      console.log('ℹ️ No byd.glb found, using procedural car');
+      car.add(buildProceduralCar());
+    });
+
+    function buildProceduralCar() {
+      const g = new THREE.Group();
+
+      // Body lower
+      const lower = new THREE.Mesh(createRoundedBoxGeo(4.4, 0.65, 1.85, 0.14), bodyMat);
+      lower.position.y = 0.5;
+      lower.castShadow = true;
+      g.add(lower);
+
+      // Cabin (glass greenhouse)
+      const cabin = new THREE.Mesh(createRoundedBoxGeo(2.0, 0.5, 1.65, 0.08), glassMat);
+      cabin.position.set(-0.15, 1.08, 0);
+      g.add(cabin);
+
+      // Hood slope (connects hood to cabin windshield)
+      const slopeGeo = new THREE.BoxGeometry(0.8, 0.04, 1.65);
+      const slope = new THREE.Mesh(slopeGeo, bodyMat);
+      slope.position.set(0.75, 0.85, 0);
+      slope.rotation.z = -0.35;
+      slope.castShadow = true;
+      g.add(slope);
+
+      // Rear slope
+      const rearSlope = new THREE.Mesh(slopeGeo, bodyMat);
+      rearSlope.position.set(-1.05, 0.85, 0);
+      rearSlope.rotation.z = 0.3;
+      rearSlope.castShadow = true;
+      g.add(rearSlope);
+
+      // LED headlights (thin strip)
+      const hlGeo = new THREE.BoxGeometry(0.06, 0.06, 0.55);
+      [0.5, -0.5].forEach(z => {
+        const hl = new THREE.Mesh(hlGeo, headlightMat);
+        hl.position.set(2.2, 0.52, z);
+        g.add(hl);
+      });
+
+      // LED taillight strip (full width — BYD signature)
+      const tlGeo = new THREE.BoxGeometry(0.05, 0.05, 1.5);
+      const tl = new THREE.Mesh(tlGeo, taillightMat);
+      tl.position.set(-2.22, 0.55, 0);
+      g.add(tl);
+
+      // Wheels
+      function createWheel() {
+        const wg = new THREE.Group();
+        const tire = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.12, 16, 32), tireMat);
+        const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.2, 5), rimMat);
+        rim.rotation.x = Math.PI / 2;
+        wg.add(tire, rim);
+        return wg;
+      }
+
+      [
+        [1.45, 0.3, 0.98], [1.45, 0.3, -0.98],
+        [-1.45, 0.3, 0.98], [-1.45, 0.3, -0.98],
+      ].forEach(([x, y, z]) => {
+        const w = createWheel();
+        w.position.set(x, y, z);
+        g.add(w);
+      });
+
+      return g;
+    }
+
+    // ─── ROAD ENVIRONMENT ───
+    const roadGroup = new THREE.Group();
+    scene.add(roadGroup);
+
+    // Asphalt road
+    const asphaltMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1a1f, roughness: 0.85, metalness: 0.05,
+    });
+    const roadGeo = new THREE.PlaneGeometry(8, 120);
+    const road = new THREE.Mesh(roadGeo, asphaltMat);
+    road.rotation.x = -Math.PI / 2;
+    road.position.set(0, -0.01, 0);
+    road.receiveShadow = true;
+    roadGroup.add(road);
+
+    // Lane markings (dashed center line)
+    const dashMat = new THREE.MeshStandardMaterial({
+      color: 0xcccccc, roughness: 0.5, emissive: 0x222222, emissiveIntensity: 0.3,
+    });
+    for (let i = -30; i < 30; i++) {
+      const dash = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.12, 1.2),
+        dashMat
+      );
+      dash.rotation.x = -Math.PI / 2;
+      dash.position.set(0, 0.005, i * 2);
+      roadGroup.add(dash);
+    }
+
+    // Side lines (continuous)
+    const sideLineMat = new THREE.MeshStandardMaterial({
+      color: 0xaaaaaa, roughness: 0.5,
+    });
+    [-3.5, 3.5].forEach(x => {
+      const line = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.1, 120),
+        sideLineMat
+      );
+      line.rotation.x = -Math.PI / 2;
+      line.position.set(x, 0.005, 0);
+      roadGroup.add(line);
+    });
+
+    // Sidewalks / curbs
+    const curbMat = new THREE.MeshStandardMaterial({
+      color: 0x2a2a30, roughness: 0.7,
+    });
+    [-4.5, 4.5].forEach(x => {
+      const curb = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.12, 120),
+        curbMat
+      );
+      curb.position.set(x, 0.06, 0);
+      curb.receiveShadow = true;
+      roadGroup.add(curb);
+    });
+
+    // Terrain beyond sidewalks
+    const terrainMat = new THREE.MeshStandardMaterial({
+      color: 0x0e0e14, roughness: 0.95,
+    });
+    [-12, 12].forEach(x => {
+      const terrain = new THREE.Mesh(
+        new THREE.PlaneGeometry(15, 120),
+        terrainMat
+      );
+      terrain.rotation.x = -Math.PI / 2;
+      terrain.position.set(x, -0.02, 0);
+      terrain.receiveShadow = true;
+      roadGroup.add(terrain);
+    });
+
+    // Street lights (postes)
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.3 });
+    const lampMat = new THREE.MeshStandardMaterial({
+      color: 0xffeedd, emissive: 0xffaa55, emissiveIntensity: 1.5,
+    });
+    for (let i = -3; i <= 3; i++) {
+      [-5.5, 5.5].forEach(x => {
+        const pole = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.05, 4, 8),
+          poleMat
+        );
+        pole.position.set(x, 2, i * 12);
+        roadGroup.add(pole);
+
+        // Lamp head
+        const lamp = new THREE.Mesh(
+          new THREE.SphereGeometry(0.12, 8, 8),
+          lampMat
+        );
+        lamp.position.set(x, 4, i * 12);
+        roadGroup.add(lamp);
+
+        // Actual light (only nearby ones)
+        if (Math.abs(i) <= 1) {
+          const streetLight = new THREE.PointLight(0xffaa55, 6, 12);
+          streetLight.position.set(x, 3.8, i * 12);
+          roadGroup.add(streetLight);
+        }
+      });
+    }
+
+    // Road rotation to align with car
+    roadGroup.rotation.y = Math.PI * 0.15;
+
+    // ─── LIGHTS ───
+    const ambient = new THREE.AmbientLight(0xffffff, 0.25);
+    scene.add(ambient);
+
+    const keyLight = new THREE.SpotLight(0xffffff, 60);
+    keyLight.position.set(5, 10, 5);
+    keyLight.angle = Math.PI / 5;
+    keyLight.penumbra = 0.6;
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.SpotLight(0x4488ff, 35);
+    fillLight.position.set(-6, 7, -4);
+    fillLight.angle = Math.PI / 4;
+    fillLight.penumbra = 0.5;
+    scene.add(fillLight);
+
+    const accentLight = new THREE.PointLight(0xff4422, 15);
+    accentLight.position.set(0, 4, -6);
+    scene.add(accentLight);
+
+    // Undercar glow
+    const underGlow = new THREE.PointLight(0x2244ff, 8);
+    underGlow.position.set(0, 0.15, 0);
+    scene.add(underGlow);
+
+    // ─── PARTICLES ───
+    const particleCount = 400;
+    const pPositions = new Float32Array(particleCount * 3);
+    const pVelocities = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      pPositions[i * 3] = (Math.random() - 0.5) * 30;
+      pPositions[i * 3 + 1] = Math.random() * 12;
+      pPositions[i * 3 + 2] = (Math.random() - 0.5) * 30;
+      pVelocities[i * 3] = (Math.random() - 0.5) * 0.005;
+      pVelocities[i * 3 + 1] = Math.random() * 0.003;
+      pVelocities[i * 3 + 2] = (Math.random() - 0.5) * 0.005;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPositions, 3));
+    const pMat = new THREE.PointsMaterial({
+      color: 0x4488ff, size: 0.04, transparent: true, opacity: 0.5,
+    });
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // ─── MOUSE TRACKING ───
+    let mouseX = 0, mouseY = 0;
+    let targetRotY = car.rotation.y;
+    let isDragging = false;
+    let prevMouseX = 0;
+    let dragRotY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / innerHeight - 0.5) * 2;
+
+      if (isDragging) {
+        const deltaX = e.clientX - prevMouseX;
+        dragRotY += deltaX * 0.005;
+        prevMouseX = e.clientX;
+      }
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      canvas.style.cursor = 'grab';
+    });
+
+    // ─── SCROLL PROGRESS ───
+    let scrollProgress = 0;
+
+    // ─── RENDER LOOP ───
+    const lookTarget = new THREE.Vector3(0, 0.6, 0);
+    const initialCamPos = { x: 7, y: 3.5, z: 9 };
+    const finalCamPos = { x: 2.5, y: 1.2, z: 3.5 };
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Mouse-follow rotation: drag overrides hover
+      if (isDragging) {
+        targetRotY = Math.PI * 0.15 + dragRotY;
+      } else {
+        targetRotY = Math.PI * 0.15 + dragRotY + mouseX * 0.25;
+      }
+      car.rotation.y += (targetRotY - car.rotation.y) * 0.08;
+
+      // Particle drift
+      const pos = pGeo.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        pos[i * 3] += pVelocities[i * 3];
+        pos[i * 3 + 1] += pVelocities[i * 3 + 1];
+        pos[i * 3 + 2] += pVelocities[i * 3 + 2];
+        if (pos[i * 3 + 1] > 14) pos[i * 3 + 1] = 0;
+      }
+      pGeo.attributes.position.needsUpdate = true;
+      particles.rotation.y += 0.0003;
+
+      // Camera position based on scroll
+      const p = scrollProgress;
+      camera.position.set(
+        initialCamPos.x + (finalCamPos.x - initialCamPos.x) * p,
+        initialCamPos.y + (finalCamPos.y - initialCamPos.y) * p,
+        initialCamPos.z + (finalCamPos.z - initialCamPos.z) * p,
+      );
+      lookTarget.y = 0.6 + p * 0.1;
+      camera.lookAt(lookTarget);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // ─── RESIZE ───
+    window.addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    // ═══════════════════════════════
+    //  GSAP — CHAOS SECTION
+    // ═══════════════════════════════
+
+    const decisions = document.querySelectorAll('.decision');
+    const totalDecisions = decisions.length;
+
+    // Grid-based distribution to avoid overlaps
+    const cols = Math.ceil(Math.sqrt(totalDecisions * (innerWidth / innerHeight)));
+    const rows = Math.ceil(totalDecisions / cols);
+    const cellW = innerWidth / cols;
+    const cellH = innerHeight / rows;
+    const pad = 20;
+
+    const decisionTweens = [];
+
+    decisions.forEach((el, i) => {
+      const rect = el.getBoundingClientRect();
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+
+      // Place within its grid cell with some randomness
+      const cellX = col * cellW + pad;
+      const cellY = row * cellH + pad;
+      const availW = Math.max(0, cellW - rect.width - pad * 2);
+      const availH = Math.max(0, cellH - rect.height - pad * 2);
+      const startX = cellX + Math.random() * availW;
+      const startY = cellY + Math.random() * availH;
+
+      gsap.set(el, { x: startX, y: startY });
+
+      // Subtle float within cell bounds
+      const driftX = Math.min(30, availW / 2);
+      const driftY = Math.min(25, availH / 2);
+
+      const tween = gsap.to(el, {
+        x: '+=' + ((Math.random() - 0.5) * driftX),
+        y: '+=' + ((Math.random() - 0.5) * driftY),
+        rotation: (Math.random() - 0.5) * 30,
+        duration: 2 + Math.random() * 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power1.inOut',
+      });
+      decisionTweens.push(tween);
+    });
+
+    // ═══════════════════════════════
+    //  CLICK TRANSITION
+    // ═══════════════════════════════
+
+    document.querySelector('.cta').addEventListener('click', () => {
+      // Organize decisions
+      gsap.to('.decision', {
+        x: innerWidth / 2 - 100,
+        y: (i) => 120 + i * 50,
+        rotation: 0,
+        opacity: 0,
+        duration: 2.2,
+        stagger: 0.08,
+        ease: 'power3.out',
+      });
+
+      // Fade chaos heading
+      gsap.to('.chaos h1', { opacity: 0, y: -40, duration: 1.2, delay: 0.5 });
+
+      // Hide chaos
+      gsap.to('.chaos', { opacity: 0, duration: 1.2, delay: 1.8, onComplete: () => {
+        // Kill all floating tweens and remove chaos from DOM
+        decisionTweens.forEach(t => t.kill());
+        document.querySelector('.chaos').remove();
+      }});
+
+      // Reveal 3D canvas
+      gsap.to('#car-canvas', { opacity: 1, duration: 2, delay: 2 });
+      gsap.to('.vignette', { opacity: 1, duration: 2, delay: 2.2 });
+
+      // Reveal calm text overlay
+      document.querySelector('.calm').style.display = 'block';
+      gsap.to('.calm', { opacity: 1, duration: 2, delay: 2.2 });
+      gsap.from('.calm-text h2', { y: 40, opacity: 0, duration: 1.5, delay: 2.8, ease: 'power3.out' });
+      gsap.to('.calm-text .line-accent', { width: 60, duration: 1.2, delay: 3.2, ease: 'power2.out' });
+      gsap.from('.calm-text p', { y: 30, opacity: 0, duration: 1.5, delay: 3.4, ease: 'power3.out' });
+
+      // Scroll hint
+      gsap.to('.scroll-hint', { opacity: 1, duration: 1, delay: 4 });
+
+      // Enable scrolling after transition
+      gsap.delayedCall(3.5, () => {
+        window.scrollTo(0, 0);
+        document.body.style.overflowY = 'auto';
+        document.body.style.overflowX = 'hidden';
+        ScrollTrigger.refresh();
+
+        // Scroll-driven animations
+        ScrollTrigger.create({
+          trigger: '.calm-sec1',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+          onUpdate: (self) => {
+            scrollProgress = self.progress;
+          },
+        });
+
+        // Hide initial text
+        gsap.to('.calm-text', {
+          y: -120,
+          opacity: 0,
+          scrollTrigger: {
+            trigger: '.calm-sec1',
+            start: 'top top',
+            end: '15% top',
+            scrub: true,
+          },
+        });
+
+        // Hide scroll hint permanently on first scroll
+        ScrollTrigger.create({
+          trigger: '.calm-sec1',
+          start: 'top top',
+          end: '2% top',
+          onEnter: () => {
+            gsap.to('.scroll-hint', { opacity: 0, duration: 0.5, onComplete: () => {
+              document.querySelector('.scroll-hint').style.display = 'none';
+            }});
+          },
+        });
+
+        // Show features at mid-scroll
+        gsap.to('.features', {
+          opacity: 1,
+          scrollTrigger: {
+            trigger: '.calm-sec1',
+            start: '25% top',
+            end: '35% top',
+            scrub: true,
+          },
+        });
+
+        gsap.utils.toArray('.feature').forEach((el, i) => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            scrollTrigger: {
+              trigger: '.calm-sec1',
+              start: `${25 + i * 3}% top`,
+              end: `${32 + i * 3}% top`,
+              scrub: true,
+            },
+          });
+        });
+
+        // Hide features before sec2
+        gsap.to('.features', {
+          opacity: 0,
+          scrollTrigger: {
+            trigger: '.calm-sec1',
+            start: '75% top',
+            end: '85% top',
+            scrub: true,
+          },
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
